@@ -1,29 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../styles/Blog.css';
 
-const Blog = () => {
-  const [selectedPost, setSelectedPost] = useState(null);
+const Blog = ({ onPostClick }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerView = 3;
-
-  // Close modal on Escape key
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        setSelectedPost(null);
-      }
-    };
-
-    if (selectedPost) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [selectedPost]);
 
   const blogPosts = [
     {
@@ -124,14 +104,6 @@ Looking ahead, I believe the most successful developers will be those who embrac
     }
   ];
 
-  const openModal = (post) => {
-    setSelectedPost(post);
-  };
-
-  const closeModal = () => {
-    setSelectedPost(null);
-  };
-
   const nextSlide = () => {
     setCurrentIndex((prev) =>
       prev + 1 >= blogPosts.length - itemsPerView + 1 ? 0 : prev + 1
@@ -145,7 +117,6 @@ Looking ahead, I believe the most successful developers will be those who embrac
   };
 
   return (
-    <>
       <section id="blog" className="card blog-section">
         <div className="card-content">
           <div className="section-header">
@@ -170,7 +141,7 @@ Looking ahead, I believe the most successful developers will be those who embrac
               style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
             >
               {blogPosts.map(post => (
-                <article key={post.id} className="blog-post" onClick={() => openModal(post)}>
+                <article key={post.id} className="blog-post" onClick={() => onPostClick(post)}>
                   <div className="blog-image-wrapper">
                     <img src={post.image} alt={post.title} className="blog-image" />
                   </div>
@@ -203,45 +174,6 @@ Looking ahead, I believe the most successful developers will be those who embrac
           </div>
         </div>
       </section>
-
-      {/* Blog Detail Modal */}
-      {selectedPost && (
-        <div className="blog-modal-overlay" onClick={closeModal}>
-          <div className="blog-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="blog-modal-close" onClick={closeModal}>
-              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
-              </svg>
-            </button>
-
-            <div className="blog-modal-image">
-              <img src={selectedPost.image} alt={selectedPost.title} />
-            </div>
-
-            <div className="blog-modal-content">
-              <span className="blog-modal-date">{selectedPost.date}</span>
-              <h2 className="blog-modal-title">{selectedPost.title}</h2>
-
-              <div className="blog-modal-body">
-                {selectedPost.content.split('\n\n').map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-              </div>
-
-              <div className="blog-modal-footer">
-                <div className="blog-modal-author">
-                  <img src="/image/profile.png" alt="Vahram Oront" className="author-avatar" />
-                  <div className="author-info">
-                    <span className="author-name">Vahram Oront</span>
-                    <span className="author-title">Senior Full Stack Developer</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
   );
 };
 

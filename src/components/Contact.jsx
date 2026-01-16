@@ -53,6 +53,20 @@ const Contact = () => {
             </div>
           </div>
         </div>
+
+        {/* Mini Google Map */}
+        <div className="contact-map">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d48764.78089668896!2d44.58760871665!3d40.27247797573!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x406aa6d5c5d9b1a7%3A0x1c0b5c5c5c5c5c5c!2sAbovyan%2C%20Armenia!5e0!3m2!1sen!2sus!4v1704067200000!5m2!1sen!2sus"
+            width="100%"
+            height="200"
+            style={{ border: 0 }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Location Map"
+          />
+        </div>
       </div>
     </section>
   );

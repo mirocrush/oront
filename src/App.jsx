@@ -13,7 +13,9 @@ import ShootingStar from './components/ShootingStar';
 import Background3D from './components/Background3D';
 import ChatBot from './components/ChatBot';
 import CustomCursor from './components/CustomCursor';
+import WeatherWidget from './components/WeatherWidget';
 import './styles/App.css';
+import './styles/Blog.css';
 
 // Fade-in section wrapper component
 const FadeInSection = ({ children }) => {
@@ -57,6 +59,7 @@ const FadeInSection = ({ children }) => {
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedBlogPost, setSelectedBlogPost] = useState(null);
 
   useEffect(() => {
     // Simulate loading time
@@ -66,6 +69,34 @@ const App = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Blog panel handlers
+  const openBlogPost = (post) => {
+    setSelectedBlogPost(post);
+  };
+
+  const closeBlogPost = () => {
+    setSelectedBlogPost(null);
+  };
+
+  // Close blog panel on Escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedBlogPost(null);
+      }
+    };
+
+    if (selectedBlogPost) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedBlogPost]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -97,7 +128,7 @@ const App = () => {
               <Education />
             </FadeInSection>
             <FadeInSection>
-              <Blog />
+              <Blog onPostClick={openBlogPost} />
             </FadeInSection>
             <FadeInSection>
               <Contact />
@@ -107,6 +138,47 @@ const App = () => {
       </main>
       <Footer />
       <ChatBot />
+      {/* <WeatherWidget /> */}
+
+      {/* Blog Detail Side Panel - At root level for proper z-index stacking */}
+      <div className={`blog-panel-overlay ${selectedBlogPost ? 'active' : ''}`} onClick={closeBlogPost} />
+      <div className={`blog-side-panel ${selectedBlogPost ? 'active' : ''}`}>
+        <div className="panel-header">
+          <h3 className="panel-title">Blog Post</h3>
+          <button className="panel-close" onClick={closeBlogPost}>
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+            </svg>
+          </button>
+        </div>
+
+        {selectedBlogPost && (
+          <div className="panel-content">
+            <div className="panel-image">
+              <img src={selectedBlogPost.image} alt={selectedBlogPost.title} />
+            </div>
+
+            <div className="panel-body">
+              <span className="panel-date">{selectedBlogPost.date}</span>
+              <h2 className="panel-post-title">{selectedBlogPost.title}</h2>
+
+              <div className="panel-text">
+                {selectedBlogPost.content.split('\n\n').map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
+              </div>
+
+              <div className="panel-author">
+                <img src="/image/profile.png" alt="Vahram Oront" className="panel-author-avatar" />
+                <div className="panel-author-info">
+                  <span className="panel-author-name">Vahram Oront</span>
+                  <span className="panel-author-title">Senior Full Stack Developer</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

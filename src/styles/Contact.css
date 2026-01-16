@@ -46,3 +46,30 @@
   font-size: 14px;
   color: var(--text-secondary);
 }
+
+/* Mini Google Map */
+.contact-map {
+  margin-top: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.contact-map iframe {
+  display: block;
+  filter: grayscale(20%);
+  transition: filter 0.3s ease;
+}
+
+.contact-map:hover iframe {
+  filter: grayscale(0%);
+}
+
+/* Dark theme map filter */
+[data-theme="dark"] .contact-map iframe {
+  filter: grayscale(20%) invert(90%) hue-rotate(180deg);
+}
+
+[data-theme="dark"] .contact-map:hover iframe {
+  filter: invert(90%) hue-rotate(180deg);
+}
