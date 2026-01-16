@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar';
 import ProfileCard from './components/ProfileCard';
 import About from './components/About';
@@ -12,7 +12,48 @@ import LoadingScreen from './components/LoadingScreen';
 import ShootingStar from './components/ShootingStar';
 import Background3D from './components/Background3D';
 import ChatBot from './components/ChatBot';
+import CustomCursor from './components/CustomCursor';
 import './styles/App.css';
+
+// Fade-in section wrapper component
+const FadeInSection = ({ children }) => {
+  const domRef = useRef();
+  const [isVisible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    const currentRef = domRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={domRef}
+      className={`fade-in-section ${isVisible ? 'visible' : ''}`}
+    >
+      {children}
+    </div>
+  );
+};
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,19 +73,35 @@ const App = () => {
 
   return (
     <div className="app">
+      <CustomCursor />
       <Background3D />
       <ShootingStar />
       <Navbar />
       <main className="main-content">
         <div className="container">
           <div className="main-column">
-            <ProfileCard />
-            <About />
-            <Experience />
-            <Skills />
-            <Education />
-            <Blog />
-            <Contact />
+            <div style={{marginTop: "20px"}}></div>
+            <FadeInSection>
+              <ProfileCard />
+            </FadeInSection>
+            <FadeInSection>
+              <About />
+            </FadeInSection>
+            <FadeInSection>
+              <Experience />
+            </FadeInSection>
+            <FadeInSection>
+              <Skills />
+            </FadeInSection>
+            <FadeInSection>
+              <Education />
+            </FadeInSection>
+            <FadeInSection>
+              <Blog />
+            </FadeInSection>
+            <FadeInSection>
+              <Contact />
+            </FadeInSection>
           </div>
         </div>
       </main>

@@ -71,8 +71,11 @@ const ChatBot = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingText, setTypingText] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const typingIntervalRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -80,7 +83,7 @@ const ChatBot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, typingText]);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -88,8 +91,45 @@ const ChatBot = () => {
     }
   }, [isOpen]);
 
+  // Cleanup typing interval on unmount
+  useEffect(() => {
+    return () => {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+    };
+  }, []);
+
+  // Typewriter effect function
+  const typewriterEffect = (fullText, onComplete) => {
+    setIsTyping(true);
+    setTypingText('');
+
+    let currentIndex = 0;
+    const words = fullText.split(' ');
+    let currentText = '';
+
+    // Clear any existing interval
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+    }
+
+    typingIntervalRef.current = setInterval(() => {
+      if (currentIndex < words.length) {
+        currentText += (currentIndex > 0 ? ' ' : '') + words[currentIndex];
+        setTypingText(currentText);
+        currentIndex++;
+      } else {
+        clearInterval(typingIntervalRef.current);
+        setIsTyping(false);
+        setTypingText('');
+        onComplete(fullText);
+      }
+    }, 80); // Speed of typing (ms per word)
+  };
+
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || isTyping) return;
 
     const userMessage = input.trim();
     setInput('');
@@ -126,21 +166,30 @@ const ChatBot = () => {
       }
 
       if (data.choices && data.choices[0]?.message?.content) {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: data.choices[0].message.content
-        }]);
+        setIsLoading(false);
+        const responseText = data.choices[0].message.content;
+
+        // Use typewriter effect
+        typewriterEffect(responseText, (finalText) => {
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: finalText
+          }]);
+        });
       } else {
         throw new Error('Invalid response format');
       }
     } catch (error) {
       console.error('Chat error:', error);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `Sorry, I'm having trouble connecting right now. Error: ${error.message}. Feel free to reach out via email at vahramoront@proton.me!`
-      }]);
-    } finally {
       setIsLoading(false);
+      const errorMessage = `Sorry, I'm having trouble connecting right now. Error: ${error.message}. Feel free to reach out via email at vahramoront@proton.me!`;
+
+      typewriterEffect(errorMessage, (finalText) => {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: finalText
+        }]);
+      });
     }
   };
 
@@ -173,7 +222,7 @@ const ChatBot = () => {
               <span className="phone-header-name">Vahram Oront</span>
               <span className="phone-header-status">
                 <span className="status-dot"></span>
-                Online
+                {isTyping ? 'Typing...' : 'Online'}
               </span>
             </div>
           </div>
@@ -194,12 +243,27 @@ const ChatBot = () => {
               </div>
             </div>
           ))}
+
+          {/* Typing indicator with text preview */}
+          {isTyping && typingText && (
+            <div className="message assistant">
+              <div className="message-bubble typing-preview">
+                {typingText}
+                <span className="typing-cursor">|</span>
+              </div>
+            </div>
+          )}
+
+          {/* Loading indicator (before API response) */}
           {isLoading && (
             <div className="message assistant">
-              <div className="message-bubble typing">
-                <span></span>
-                <span></span>
-                <span></span>
+              <div className="message-bubble typing-indicator">
+                <span className="typing-label">Vahram is typing</span>
+                <span className="typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
               </div>
             </div>
           )}
@@ -215,12 +279,12 @@ const ChatBot = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type a message..."
-            disabled={isLoading}
+            disabled={isLoading || isTyping}
           />
           <button
             className="send-btn"
             onClick={sendMessage}
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isLoading || isTyping}
           >
             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>

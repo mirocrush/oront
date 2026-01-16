@@ -39,7 +39,10 @@ const Navbar = () => {
       <div className="navbar-container">
         {/* Logo - Name */}
         <a href="#" className="navbar-logo">
-          <span className="logo-text">Vahram Oront</span>
+          <span className="logo-text">
+            <span className="logo-first">Vahram</span>
+            <span className="logo-last">Oront</span>
+          </span>
         </a>
 
         {/* Navigation Links */}

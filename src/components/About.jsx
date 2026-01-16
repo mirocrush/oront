@@ -6,7 +6,7 @@ const About = () => {
 
   const fullText = `Senior Full Stack Developer with 7+ years of experience building end-to-end web applications, SaaS platforms, and innovative AI/ML and blockchain solutions. My favorite language is JavaScript, and I'm strong in backend development, API integration, and DevOps on AWS and Docker. Throughout my development journey, I've cultivated an artistic eye and the capability of creating beautiful, responsive UX/UI with creative ideas. I enjoy daily coding and am always open to new opportunities and challenges! I specialize in modern web technologies including React, Next.js, Vue.js, and Node.js. On the blockchain side, I have extensive experience with Ethereum, Solidity smart contracts, XRP Ledger, and Web3 integrations. I'm passionate about building scalable, maintainable systems that deliver real value.`;
 
-  const shortText = fullText.slice(0, 370);
+  const shortText = fullText.slice(0, 600);
 
   return (
     <section id="about" className="card">

@@ -2,6 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  cursor: none !important;
 }
 
 .main-content {

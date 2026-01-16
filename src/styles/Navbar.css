@@ -30,16 +30,33 @@
 .logo-text {
   font-size: 20px;
   font-weight: 700;
-  color: var(--primary);
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logo-first {
+  color: var(--primary);
+}
+
+.logo-last {
+  background-color: #0a66c2;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .navbar-logo:hover {
   text-decoration: none;
 }
 
-.navbar-logo:hover .logo-text {
+.navbar-logo:hover .logo-first {
   color: var(--primary-dark);
+}
+
+.navbar-logo:hover .logo-last {
+  background-color: #004182;
 }
 
 /* Navigation links - LinkedIn style with icons on top */

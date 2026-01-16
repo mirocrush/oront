@@ -1,17 +1,71 @@
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import FluidCursor from './FluidCursor';
 import '../styles/Background3D.css';
 
 const Background3D = () => {
   const canvasRef = useRef(null);
+  const gradientRef = useRef(null);
   const animationRef = useRef(null);
+  const gradientAnimationRef = useRef(null);
   const { isDark } = useTheme();
 
+  // Dynamic gradient background animation
+  useEffect(() => {
+    const gradientElement = gradientRef.current;
+    let gradientAngle = 0;
+    let colorPhase = 0;
+
+    const animateGradient = () => {
+      gradientAngle = (gradientAngle + 0.3) % 360;
+      colorPhase = (colorPhase + 0.005) % 1;
+
+      let colors;
+      if (isDark) {
+        // Dark theme: golden/amber tones shifting
+        const hue1 = 35 + Math.sin(colorPhase * Math.PI * 2) * 15; // 20-50 (gold range)
+        const hue2 = 45 + Math.cos(colorPhase * Math.PI * 2) * 20; // 25-65
+        const hue3 = 30 + Math.sin(colorPhase * Math.PI * 2 + 1) * 10;
+        colors = [
+          `hsla(${hue1}, 60%, 8%, 1)`,
+          `hsla(${hue2}, 50%, 12%, 1)`,
+          `hsla(${hue3}, 40%, 6%, 1)`,
+          `hsla(${hue1 + 10}, 55%, 10%, 1)`
+        ];
+      } else {
+        // Light theme: LinkedIn blue tones shifting
+        const hue1 = 205 + Math.sin(colorPhase * Math.PI * 2) * 10; // 195-215 (blue range)
+        const hue2 = 210 + Math.cos(colorPhase * Math.PI * 2) * 15;
+        const hue3 = 200 + Math.sin(colorPhase * Math.PI * 2 + 1) * 12;
+        colors = [
+          `hsla(${hue1}, 70%, 95%, 1)`,
+          `hsla(${hue2}, 60%, 92%, 1)`,
+          `hsla(${hue3}, 50%, 97%, 1)`,
+          `hsla(${hue1 - 5}, 65%, 94%, 1)`
+        ];
+      }
+
+      gradientElement.style.background = `
+        linear-gradient(${gradientAngle}deg, ${colors[0]} 0%, ${colors[1]} 33%, ${colors[2]} 66%, ${colors[3]} 100%)
+      `;
+
+      gradientAnimationRef.current = requestAnimationFrame(animateGradient);
+    };
+
+    animateGradient();
+
+    return () => {
+      if (gradientAnimationRef.current) {
+        cancelAnimationFrame(gradientAnimationRef.current);
+      }
+    };
+  }, [isDark]);
+
+  // Atom/molecule canvas animation
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
-    // Set canvas size
     const setCanvasSize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -19,46 +73,55 @@ const Background3D = () => {
     setCanvasSize();
     window.addEventListener('resize', setCanvasSize);
 
-    // Theme-aware color
-    const getPlanetColor = (opacity) => {
+    // Theme-aware colors
+    const getAtomColor = (opacity) => {
       if (isDark) {
-        // Golden color for dark theme
         return `rgba(255, 200, 50, ${opacity})`;
       } else {
-        // LinkedIn blue for light theme
         return `rgba(10, 102, 194, ${opacity})`;
       }
     };
 
-    // Planet class - simulates galaxy planets
-    class Planet {
+    const getElectronColor = (opacity) => {
+      if (isDark) {
+        return `rgba(255, 180, 100, ${opacity})`;
+      } else {
+        return `rgba(0, 119, 181, ${opacity})`;
+      }
+    };
+
+    // Atom class - nucleus with orbiting electrons
+    class Atom {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 25 + 15;  // 15-40px radius
-        this.rotationAngle = Math.random() * Math.PI * 2;
-        this.rotationSpeed = (Math.random() - 0.5) * 0.03;
+        this.nucleusSize = Math.random() * 6 + 3;  // 3-9px radius (smaller for more)
 
-        // Fast movement
-        this.velocityX = (Math.random() - 0.5) * 3;
-        this.velocityY = (Math.random() - 0.5) * 3;
+        this.velocityX = (Math.random() - 0.5) * 1.2;
+        this.velocityY = (Math.random() - 0.5) * 1.2;
 
-        this.opacity = Math.random() * 0.2 + 0.1;
+        this.opacity = Math.random() * 0.3 + 0.15;
 
-        // Planet ring (like Saturn) - random chance
-        this.hasRing = Math.random() > 0.6;
-        this.ringTilt = Math.random() * 0.5 + 0.2;
+        // Electron orbits (1-3 orbits per atom)
+        this.orbitCount = Math.floor(Math.random() * 3) + 1;
+        this.orbits = [];
+
+        for (let i = 0; i < this.orbitCount; i++) {
+          this.orbits.push({
+            radius: this.nucleusSize * (2.5 + i * 1.5),
+            angle: Math.random() * Math.PI * 2,
+            speed: (Math.random() * 0.04 + 0.02) * (Math.random() > 0.5 ? 1 : -1),
+            tilt: Math.random() * 0.7 + 0.2,
+            rotation: Math.random() * Math.PI,
+            electronCount: Math.floor(Math.random() * 2) + 1
+          });
+        }
       }
 
       update() {
-        // Update rotation
-        this.rotationAngle += this.rotationSpeed;
-
-        // Update position with fast movement
         this.x += this.velocityX;
         this.y += this.velocityY;
 
-        // Bounce off edges
         if (this.x < -50 || this.x > canvas.width + 50) {
           this.velocityX *= -1;
           this.x = Math.max(-50, Math.min(canvas.width + 50, this.x));
@@ -68,18 +131,16 @@ const Background3D = () => {
           this.y = Math.max(-50, Math.min(canvas.height + 50, this.y));
         }
 
-        // Slight velocity dampening
-        this.velocityX *= 0.9995;
-        this.velocityY *= 0.9995;
+        this.orbits.forEach(orbit => {
+          orbit.angle += orbit.speed;
+        });
 
-        // Add small random drift to keep movement interesting
-        if (Math.random() < 0.01) {
-          this.velocityX += (Math.random() - 0.5) * 0.5;
-          this.velocityY += (Math.random() - 0.5) * 0.5;
+        if (Math.random() < 0.008) {
+          this.velocityX += (Math.random() - 0.5) * 0.2;
+          this.velocityY += (Math.random() - 0.5) * 0.2;
         }
 
-        // Clamp velocities
-        const maxSpeed = 4;
+        const maxSpeed = 1.8;
         this.velocityX = Math.max(-maxSpeed, Math.min(maxSpeed, this.velocityX));
         this.velocityY = Math.max(-maxSpeed, Math.min(maxSpeed, this.velocityY));
       }
@@ -87,176 +148,331 @@ const Background3D = () => {
       draw(ctx) {
         ctx.save();
 
-        const color = getPlanetColor(this.opacity);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1.5;
+        const atomColor = getAtomColor(this.opacity);
+        const electronColor = getElectronColor(this.opacity * 1.3);
 
-        // Draw planet body (circle with longitude/latitude lines for 3D effect)
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Inner circle for depth
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.7, 0, Math.PI * 2);
-        ctx.globalAlpha = this.opacity * 0.5;
-        ctx.stroke();
-
-        // Horizontal line (equator) with 3D tilt
-        ctx.globalAlpha = this.opacity * 0.7;
-        ctx.beginPath();
-        ctx.ellipse(
-          this.x,
-          this.y,
-          this.size,
-          this.size * Math.abs(Math.sin(this.rotationAngle)) * 0.3 + 0.1,
-          0,
-          0,
-          Math.PI * 2
-        );
-        ctx.stroke();
-
-        // Vertical meridian line
-        ctx.beginPath();
-        ctx.ellipse(
-          this.x,
-          this.y,
-          this.size * Math.abs(Math.cos(this.rotationAngle)) * 0.3 + 0.1,
-          this.size,
-          0,
-          0,
-          Math.PI * 2
-        );
-        ctx.stroke();
-
-        // Draw ring if planet has one (Saturn-like)
-        if (this.hasRing) {
-          ctx.globalAlpha = this.opacity * 0.6;
+        // Draw electron orbits
+        this.orbits.forEach(orbit => {
           ctx.beginPath();
+          ctx.strokeStyle = getAtomColor(this.opacity * 0.25);
+          ctx.lineWidth = 0.6;
           ctx.ellipse(
-            this.x,
-            this.y,
-            this.size * 1.6,
-            this.size * this.ringTilt,
-            this.rotationAngle * 0.2,
-            0,
-            Math.PI * 2
+            this.x, this.y,
+            orbit.radius, orbit.radius * orbit.tilt,
+            orbit.rotation, 0, Math.PI * 2
           );
           ctx.stroke();
 
-          // Inner ring
+          // Draw electrons
+          for (let e = 0; e < orbit.electronCount; e++) {
+            const electronAngle = orbit.angle + (e * Math.PI * 2 / orbit.electronCount);
+            const ex = this.x + Math.cos(electronAngle) * orbit.radius * Math.cos(orbit.rotation)
+                      - Math.sin(electronAngle) * orbit.radius * orbit.tilt * Math.sin(orbit.rotation);
+            const ey = this.y + Math.cos(electronAngle) * orbit.radius * Math.sin(orbit.rotation)
+                      + Math.sin(electronAngle) * orbit.radius * orbit.tilt * Math.cos(orbit.rotation);
+
+            // Electron glow
+            const gradient = ctx.createRadialGradient(ex, ey, 0, ex, ey, 3);
+            gradient.addColorStop(0, electronColor);
+            gradient.addColorStop(1, 'transparent');
+
+            ctx.beginPath();
+            ctx.fillStyle = gradient;
+            ctx.arc(ex, ey, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.fillStyle = electronColor;
+            ctx.arc(ex, ey, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        // Draw nucleus glow
+        const nucleusGradient = ctx.createRadialGradient(
+          this.x, this.y, 0,
+          this.x, this.y, this.nucleusSize * 1.5
+        );
+        nucleusGradient.addColorStop(0, atomColor);
+        nucleusGradient.addColorStop(1, 'transparent');
+
+        ctx.beginPath();
+        ctx.fillStyle = nucleusGradient;
+        ctx.arc(this.x, this.y, this.nucleusSize * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Nucleus protons
+        const protonCount = Math.floor(this.nucleusSize / 2.5) + 2;
+        for (let i = 0; i < protonCount; i++) {
+          const angle = (i / protonCount) * Math.PI * 2;
+          const distance = this.nucleusSize * 0.25;
+          const px = this.x + Math.cos(angle) * distance;
+          const py = this.y + Math.sin(angle) * distance;
+
           ctx.beginPath();
-          ctx.ellipse(
-            this.x,
-            this.y,
-            this.size * 1.3,
-            this.size * this.ringTilt * 0.8,
-            this.rotationAngle * 0.2,
-            0,
-            Math.PI * 2
-          );
-          ctx.stroke();
+          ctx.fillStyle = atomColor;
+          ctx.arc(px, py, this.nucleusSize * 0.35, 0, Math.PI * 2);
+          ctx.fill();
         }
+
+        ctx.beginPath();
+        ctx.fillStyle = atomColor;
+        ctx.arc(this.x, this.y, this.nucleusSize * 0.3, 0, Math.PI * 2);
+        ctx.fill();
 
         ctx.restore();
       }
     }
 
-    // Create planets
-    const planetCount = Math.min(Math.floor((canvas.width * canvas.height) / 100000), 12);
-    const planets = [];
+    // Molecule bond class
+    class MoleculeBond {
+      constructor(atom1, atom2) {
+        this.atom1 = atom1;
+        this.atom2 = atom2;
+      }
 
-    for (let i = 0; i < planetCount; i++) {
-      planets.push(new Planet());
+      draw(ctx, opacity) {
+        const dx = this.atom2.x - this.atom1.x;
+        const dy = this.atom2.y - this.atom1.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const perpX = -dy / distance * 2.5;
+        const perpY = dx / distance * 2.5;
+
+        ctx.strokeStyle = getAtomColor(opacity * 0.35);
+        ctx.lineWidth = 1.2;
+
+        ctx.beginPath();
+        ctx.moveTo(this.atom1.x + perpX, this.atom1.y + perpY);
+        ctx.lineTo(this.atom2.x + perpX, this.atom2.y + perpY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(this.atom1.x - perpX, this.atom1.y - perpY);
+        ctx.lineTo(this.atom2.x - perpX, this.atom2.y - perpY);
+        ctx.stroke();
+      }
     }
 
-    // Collision detection and gentle push
-    const COLLISION_DISTANCE_FACTOR = 2.2;  // Multiplier for combined radii
-    const PUSH_STRENGTH = 0.3;  // Gentle push
+    // Free electron class
+    class FreeElectron {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.velocityX = (Math.random() - 0.5) * 5;
+        this.velocityY = (Math.random() - 0.5) * 5;
+        this.size = Math.random() * 1.5 + 0.8;
+        this.opacity = Math.random() * 0.5 + 0.25;
+        this.trail = [];
+        this.maxTrailLength = 10;
+      }
 
-    const applyCollisions = () => {
-      for (let i = 0; i < planets.length; i++) {
-        for (let j = i + 1; j < planets.length; j++) {
-          const p1 = planets[i];
-          const p2 = planets[j];
+      update() {
+        this.trail.unshift({ x: this.x, y: this.y });
+        if (this.trail.length > this.maxTrailLength) {
+          this.trail.pop();
+        }
 
-          const dx = p2.x - p1.x;
-          const dy = p2.y - p1.y;
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+
+        if (Math.random() < 0.025) {
+          this.velocityX += (Math.random() - 0.5) * 1.2;
+          this.velocityY += (Math.random() - 0.5) * 1.2;
+        }
+
+        const maxSpeed = 6;
+        const speed = Math.sqrt(this.velocityX ** 2 + this.velocityY ** 2);
+        if (speed > maxSpeed) {
+          this.velocityX = (this.velocityX / speed) * maxSpeed;
+          this.velocityY = (this.velocityY / speed) * maxSpeed;
+        }
+      }
+
+      draw(ctx) {
+        const color = getElectronColor(this.opacity);
+
+        // Draw trail
+        this.trail.forEach((pos, index) => {
+          const trailOpacity = (1 - index / this.maxTrailLength) * this.opacity * 0.4;
+          ctx.beginPath();
+          ctx.fillStyle = getElectronColor(trailOpacity);
+          ctx.arc(pos.x, pos.y, this.size * (1 - index / this.maxTrailLength * 0.6), 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Glow
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.beginPath();
+        ctx.fillStyle = gradient;
+        ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Burst electron class - created on click, fades out
+    class BurstElectron {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8 + 6;
+        this.velocityX = Math.cos(angle) * speed;
+        this.velocityY = Math.sin(angle) * speed;
+        this.size = Math.random() * 2 + 1.5;
+        this.opacity = 1;
+        this.life = 1;
+        this.decay = 0.015 + Math.random() * 0.01;
+        this.trail = [];
+        this.maxTrailLength = 8;
+      }
+
+      update() {
+        this.trail.unshift({ x: this.x, y: this.y });
+        if (this.trail.length > this.maxTrailLength) {
+          this.trail.pop();
+        }
+
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+        this.life -= this.decay;
+        this.opacity = this.life;
+
+        // Slow down gradually
+        this.velocityX *= 0.98;
+        this.velocityY *= 0.98;
+      }
+
+      draw(ctx) {
+        if (this.life <= 0) return;
+
+        const color = getElectronColor(this.opacity * 0.8);
+
+        // Draw trail
+        this.trail.forEach((pos, index) => {
+          const trailOpacity = (1 - index / this.maxTrailLength) * this.opacity * 0.5;
+          ctx.beginPath();
+          ctx.fillStyle = getElectronColor(trailOpacity);
+          ctx.arc(pos.x, pos.y, this.size * (1 - index / this.maxTrailLength * 0.5), 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Glow
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 4);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.beginPath();
+        ctx.fillStyle = gradient;
+        ctx.arc(this.x, this.y, this.size * 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      isDead() {
+        return this.life <= 0;
+      }
+    }
+
+    // Array to hold burst electrons
+    const burstElectrons = [];
+
+    // Create MORE atoms (increased from ~15 to ~30)
+    const atomCount = Math.min(Math.floor((canvas.width * canvas.height) / 40000), 35);
+    const atoms = [];
+    for (let i = 0; i < atomCount; i++) {
+      atoms.push(new Atom());
+    }
+
+    // Create MORE free electrons (increased from ~8 to ~18)
+    const freeElectronCount = Math.min(Math.floor((canvas.width * canvas.height) / 60000), 20);
+    const freeElectrons = [];
+    for (let i = 0; i < freeElectronCount; i++) {
+      freeElectrons.push(new FreeElectron());
+    }
+
+    // Draw molecular bonds
+    const drawMolecularBonds = () => {
+      const maxBondDistance = 180;
+
+      for (let i = 0; i < atoms.length; i++) {
+        for (let j = i + 1; j < atoms.length; j++) {
+          const a1 = atoms[i];
+          const a2 = atoms[j];
+
+          const dx = a2.x - a1.x;
+          const dy = a2.y - a1.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Collision distance based on planet sizes
-          const minDistance = (p1.size + p2.size) * COLLISION_DISTANCE_FACTOR;
-
-          if (distance < minDistance && distance > 1) {
-            // Normalize direction
-            const nx = dx / distance;
-            const ny = dy / distance;
-
-            // Gentle push - closer = slightly stronger
-            const overlap = minDistance - distance;
-            const force = (overlap / minDistance) * PUSH_STRENGTH;
-
-            // Push planets apart gently
-            p1.velocityX -= nx * force;
-            p1.velocityY -= ny * force;
-            p2.velocityX += nx * force;
-            p2.velocityY += ny * force;
+          if (distance < maxBondDistance) {
+            const opacity = (1 - distance / maxBondDistance) * 0.35;
+            const bond = new MoleculeBond(a1, a2);
+            bond.draw(ctx, opacity);
           }
         }
       }
     };
 
-    // Draw connection lines between nearby planets (like gravitational fields)
-    const drawConnections = () => {
-      const maxLineDistance = 250;
-
-      for (let i = 0; i < planets.length; i++) {
-        for (let j = i + 1; j < planets.length; j++) {
-          const p1 = planets[i];
-          const p2 = planets[j];
-
-          const dx = p2.x - p1.x;
-          const dy = p2.y - p1.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < maxLineDistance) {
-            const opacity = (1 - distance / maxLineDistance) * 0.15;
-
-            ctx.beginPath();
-            ctx.strokeStyle = getPlanetColor(opacity);
-            ctx.lineWidth = 1;
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          }
-        }
+    // Click handler to create burst electrons
+    const handleClick = (e) => {
+      const count = Math.floor(Math.random() * 3) + 3; // 3-5 electrons
+      for (let i = 0; i < count; i++) {
+        burstElectrons.push(new BurstElectron(e.clientX, e.clientY));
       }
     };
+
+    window.addEventListener('click', handleClick);
 
     // Animation loop
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Apply collision forces
-      applyCollisions();
+      drawMolecularBonds();
 
-      // Draw connections first (behind planets)
-      drawConnections();
-
-      // Update and draw planets
-      planets.forEach(planet => {
-        planet.update();
-        planet.draw(ctx);
+      atoms.forEach(atom => {
+        atom.update();
+        atom.draw(ctx);
       });
+
+      freeElectrons.forEach(electron => {
+        electron.update();
+        electron.draw(ctx);
+      });
+
+      // Update and draw burst electrons
+      for (let i = burstElectrons.length - 1; i >= 0; i--) {
+        burstElectrons[i].update();
+        burstElectrons[i].draw(ctx);
+        if (burstElectrons[i].isDead()) {
+          burstElectrons.splice(i, 1);
+        }
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     };
 
     animate();
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', setCanvasSize);
+      window.removeEventListener('click', handleClick);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
@@ -264,10 +480,11 @@ const Background3D = () => {
   }, [isDark]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="background-3d-canvas"
-    />
+    <div className="background-container">
+      <div ref={gradientRef} className="dynamic-gradient" />
+      <FluidCursor />
+      <canvas ref={canvasRef} className="background-3d-canvas" />
+    </div>
   );
 };
 
