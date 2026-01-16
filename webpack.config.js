@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
@@ -43,7 +44,10 @@ module.exports = {
         { from: 'image', to: 'image' },
       ],
     }),
-    new Dotenv(),
+    new Dotenv({ systemvars: true }),
+    new webpack.DefinePlugin({
+      'process.env.OPENROUTER_API_KEY': JSON.stringify(process.env.OPENROUTER_API_KEY),
+    }),
   ],
   resolve: {
     extensions: ['.js', '.jsx'],
