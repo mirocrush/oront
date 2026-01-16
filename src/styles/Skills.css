@@ -1,0 +1,27 @@
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-item {
+  padding: 8px 12px;
+  background-color: var(--bg-tertiary);
+  border-radius: 16px;
+  transition: background-color 0.2s;
+}
+
+.skill-item:hover {
+  background-color: var(--primary);
+}
+
+.skill-item:hover .skill-name {
+  color: white;
+}
+
+.skill-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: color 0.2s;
+}

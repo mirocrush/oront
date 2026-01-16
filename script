@@ -1,0 +1,74 @@
+Vahram Oront   
+(Senior Full Stack Engineer)
+
+vahramoront@proton.me | Abovyan, Kotayk Province, Armenia
+https://www.linkedin.com/in/vahram-oront-7003973a6
+
+SUMMARY
+Senior Full Stack Developer with 7+ years of experience building end-to-end web apps, SaaS platforms and AI/ML and blockchain solutions. My favorite language is JavaScript and I am strong in backend, API integration and DevOps on AWS and Docker. During my long development journey, I’ve also gained an artistic eye and the capability of creating beautiful and responsive UX / UI with creative ideas. I enjoy daily coding and I am always open to new works and new challenges!
+
+
+PROFESSIONAL EXPERIENCE 
+Senior Full Stack Developer
+ResCode - onsite
+ (Oct 2024 – current | Yerevan, Armenia)
+- Working with clients to design and build blockchain-enabled applications on Ethereum (Mainnet and Sepolia) and the XRP Ledger, focusing on smart contract development and Web3 integrations.
+- Developed and deployed Solidity smart contracts for NFT minting, burning and transferring.
+- Integrated WalletConnect for user authentication and transaction signing across web applications.
+- Built frontend-to-blockchain interactions using Web3.js and Ethers.js.
+- Provided end-to-end delivery including contract testing, deployment for dApps.
+- Built responsive frontends using React, Next.js, Vue.js, Nuxt, with state management via Redux, Vuex, and Pinia and styled using Tailwind CSS and Material UI.
+- Developed scalable backend services with Node.js, Express, Flask, and Django, exposing secure REST APIs and real-time features via Socket.io.
+
+Full Stack & Blockchain Engineer
+Xurge Digital Lab LLC - remote
+(Feb 2023 – June 2024 | Fayetteville, NC, United States)
+- Architected a federated Matrix/Synapse communication platform with integrated XRP Ledger wallets for secure enterprise messaging and led development of multiple microservices across frontend, backend, and homeserver layers.
+- Built XRPL wallet integration with XUMM, GEM Wallet, and CrossMark, including cryptographic signature verification, wallet validation, OAuth2 PKCE flows, and secure JWT-based multi-wallet session management.
+- Developed a TypeScript / Node.js backend on AdonisJS with REST APIs, Socket.io real-time messaging, Twilio Conversations, Lucid ORM (MySQL / PostgreSQL / SQLite), Bull queues, Redis caching, and Swagger / OpenAPI documentation.
+- Created a Next.js / React / TypeScript frontend with Tailwind CSS, Radix UI, WalletConnect, secure cookie sessions using encrypted wallet data, QR-based wallet connection flows, and Axios-based API/JWT handling.
+- Containerized services with Docker, deployed to AWS EC2 with PM2 process management, added structured logging via Pino, and enforced strict TypeScript, ESLint, Prettier, Jest tests, and OpenAPI specs for reliable CI/CD-ready delivery.
+
+Full Stack Developer & Devops Engineer
+Miro AI - remote
+(May 2020 – Oct 2022 | Santa Monica, California, United States)
+- Built the multi‑tenant runnertag AI SaaS with Vue 2 / Vuex / BootstrapVue client, admin website with Vue 3 / Pinia / Prime Vue admin, and a Node.js / Express / MySQL / Sequelize REST API.
+- Deployed the platform on AWS using EC2, RDS, S3, CloudFront and Elastic Load Balancing.
+- Implemented auth and user management with AWS Cognito and JWT for multi‑tenant access.
+- Created AWS Lambda + API Gateway microservices for background jobs, webhooks.
+- Automated CI/CD to AWS with Bitbucket Actions and CodeDeploy / CodePipeline.
+- Used AWS S3 and signed URLs from the API to store and serve user media through CloudFront.
+- Developed a responsive UI for Artsio using Tailwind, NextJs and TypeScript.
+- Integrated AI image generation services by using Stable Diffusion, handling prompt submission, image retrieval and built Discord Artsio service bot using Go Programming Language.
+- Implemented advanced search and filtering using Elastic Search and MySQL database to support queries by style, color palette, subject, and aesthetic score.
+
+
+Front end developer & AI Engineer
+SmartClick - contract
+(Nov 2018 – Mar 2020 | Yerevan, Armenia)
+- Developed a responsive UI for Artsio using HTML5, CSS3, Tailwind, NextJs and TypeScript.
+- Integrated AI image generation services by using Stable Diffusion, handling prompt submission, image retrieval and built Discord Artsio service bot using Go Programming Language.
+- Implemented advanced search and filtering using Elastic Search and MySQL database to support queries by style, color palette, subject, and aesthetic score.
+- Built image remix and prompt‑editing tools with Redux and canvas -based editors for real‑time previews and transformations.
+- Collaborated on DevOps practices by containerizing front‑end services with Docker, integrating CI/CD pipelines and deploying to AWS with monitoring and logging.
+
+
+TECHNICAL SKILLS 
+Languages: JavaScript | TypeScript | Python | C++ | QT | PHP
+Frontend: React | Redux | Next.js | Vue.js | Vuex | Pinia | Nuxt | Tailwind CSS | BootstrapVue | Material UI
+Backend: Node.js | Express | Flask | Django | REST APIs | Socket.io | Sequelize | MySQL | PostgreSQL
+AI / ML: Stable Diffusion | RNN | LSTM | CNN | GAN | LLM
+Blockchain: Ethereum (Mainnet, Sepolia) | Solidity | XRP Ledger | WalletConnect | Metamask | Web3.js | Ethers.js | NFT minting, burning, transferring
+CI/CD & DevOps: AWS EC2 | AWS RDS | AWS S3 | CloudFront | AWS Cognito | AWS Lambda | Docker | GitHub | Bitbucket | Vercel | Netlify | Jira
+
+EDUCATION
+Bachelor of Science in Artificial Intelligence
+National Polytechnic University of Armenia, Armenia
+(May 2013 – Nov 2017 | Abovyan city, Kotayk Province, Armenia)
+- Completed a comprehensive program covering algorithms, data structures, databases, web technologies, discrete mathematics, probability and logic with a strong emphasis.
+- Followed a study track oriented toward Software and Data Engineering and Databases and Web, gaining experience in full stack web application design, big data processing and cloud/distributed solutions. 
+- Took elective courses in artificial intelligence and related topics such as machine learning, language technologies and software engineering projects, building a strong basis for later AI-focused work. 
+
+LANGUAGES 
+Armenian: Native
+English: Proficient
